@@ -17,6 +17,9 @@ psycopg2-binary = "^2.9.10"
 
 [tool.poetry.group.dev.dependencies]
 ipython = "^9.4.0"
+pytest = "^8.4.1"
+pytest-django = "^4.11.1"
+pytest-cov = "^6.2.1"
 
 
 [tool.poetry.group.lint.dependencies]
