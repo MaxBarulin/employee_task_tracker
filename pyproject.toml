@@ -9,10 +9,10 @@ readme = "README.md"
 python = "^3.11"
 django = "^5.2.4"
 python-dotenv = "^1.1.1"
-psycopg2 = "^2.9.10"
 requests = "^2.32.4"
 djangorestframework = "^3.16.0"
 drf-spectacular = "^0.28.0"
+psycopg2-binary = "^2.9.10"
 
 
 [tool.poetry.group.dev.dependencies]
