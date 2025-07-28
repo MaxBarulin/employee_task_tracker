@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "employee-task-tracker"
+version = "0.1.0"
+description = ""
+authors = ["Max Barulin <barulin.max@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+django = "^5.2.4"
+python-dotenv = "^1.1.1"
+psycopg2 = "^2.9.10"
+requests = "^2.32.4"
+djangorestframework = "^3.16.0"
+
+
+[tool.poetry.group.dev.dependencies]
+ipython = "^9.4.0"
+
+
+[tool.poetry.group.lint.dependencies]
+flake8 = "^7.3.0"
+mypy = "^1.17.0"
+black = "^25.1.0"
+isort = "^6.0.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
