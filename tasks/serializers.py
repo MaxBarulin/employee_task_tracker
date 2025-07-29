@@ -8,8 +8,8 @@ from .models import Task, TaskStatus
 
 class TaskSerializer(serializers.ModelSerializer):
     """
-    Сериализатор для модели Task.
-    Включает в себя CRUD операции и кастомную валидацию.
+    Сериализатор для модели Task
+    Включает в себя CRUD операции и кастомную бизнес-логику для валидации данных
     """
 
     class Meta:
@@ -18,8 +18,11 @@ class TaskSerializer(serializers.ModelSerializer):
 
     def validate_deadline(self, value):
         """
-        Проверяет, что дедлайн задачи не находится в прошлом.
+        Проверяет, что дедлайн задачи не находится в прошлом
         """
+        # self.instance - это объект, который обновляется (None при создании).
+        # Эта проверка позволяет редактировать старые задачи с прошедшим дедлайном,
+        # но не создавать новые или переносить существующие в прошлое
         if self.instance and self.instance.deadline == value:
             return value
 
@@ -29,13 +32,16 @@ class TaskSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         """
-        Метод для валидации, затрагивающей несколько полей.
+        Метод для сложной валидации, затрагивающей несколько полей
+        1. Проверяет, что у дочерней задачи дедлайн не позже родительской
+        2. Проверяет, что у задачи со статусом "Выполнено" есть исполнитель
         """
         parent_task = data.get("parent")
         deadline = data.get("deadline")
         status = data.get("status")
         assignee = data.get("assignee")
 
+        # Проверка 1: Дедлайн дочерней задачи
         if parent_task and deadline:
             if deadline > parent_task.deadline:
                 raise serializers.ValidationError(
@@ -43,10 +49,11 @@ class TaskSerializer(serializers.ModelSerializer):
                         "deadline": "Дедлайн дочерней задачи не может быть позже дедлайна родительской."
                     }
                 )
-
+        # Проверка 2: Статус "Выполнено"
+        # Логика для получения текущего исполнителя как при создании, так и при обновлении
         current_assignee = assignee or (self.instance and self.instance.assignee)
 
-        # 2. ИСПРАВЛЕНИЕ: Обращаемся к TaskStatus напрямую
+        # Обращаемся к TaskStatus напрямую
         if status == TaskStatus.DONE and not current_assignee:
             raise serializers.ValidationError(
                 {"status": "Нельзя завершить задачу, у которой нет исполнителя."}
@@ -57,8 +64,8 @@ class TaskSerializer(serializers.ModelSerializer):
 
 class ImportantTaskSerializer(serializers.Serializer):
     """
-    Сериализатор для специального эндпоинта "Важные задачи".
-    Используется только для вывода данных (read-only).
+    Сериализатор для специального эндпоинта "Важные задачи"
+    Используется только для вывода данных (read-only), поэтому не является ModelSerializer
     """
 
     task_name = serializers.CharField(read_only=True)
