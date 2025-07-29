@@ -1,4 +1,5 @@
 from datetime import date
+
 from rest_framework import serializers
 
 # 1. ИСПРАВЛЕНИЕ: Импортируем и Task, и TaskStatus
@@ -13,7 +14,7 @@ class TaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Task
-        fields = ('id', 'name', 'parent', 'assignee', 'status', 'deadline')
+        fields = ("id", "name", "parent", "assignee", "status", "deadline")
 
     def validate_deadline(self, value):
         """
@@ -30,15 +31,17 @@ class TaskSerializer(serializers.ModelSerializer):
         """
         Метод для валидации, затрагивающей несколько полей.
         """
-        parent_task = data.get('parent')
-        deadline = data.get('deadline')
-        status = data.get('status')
-        assignee = data.get('assignee')
+        parent_task = data.get("parent")
+        deadline = data.get("deadline")
+        status = data.get("status")
+        assignee = data.get("assignee")
 
         if parent_task and deadline:
             if deadline > parent_task.deadline:
                 raise serializers.ValidationError(
-                    {"deadline": "Дедлайн дочерней задачи не может быть позже дедлайна родительской."}
+                    {
+                        "deadline": "Дедлайн дочерней задачи не может быть позже дедлайна родительской."
+                    }
                 )
 
         current_assignee = assignee or (self.instance and self.instance.assignee)
@@ -57,6 +60,9 @@ class ImportantTaskSerializer(serializers.Serializer):
     Сериализатор для специального эндпоинта "Важные задачи".
     Используется только для вывода данных (read-only).
     """
+
     task_name = serializers.CharField(read_only=True)
     deadline = serializers.DateField(read_only=True)
-    suitable_employees = serializers.ListField(child=serializers.CharField(), read_only=True)
+    suitable_employees = serializers.ListField(
+        child=serializers.CharField(), read_only=True
+    )
